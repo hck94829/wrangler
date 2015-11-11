@@ -581,44 +581,44 @@ dw.display_name = function(name){
 
 dw.wrangle = function(){
 	var w = [];
-	
+
 	w.apply = function(tables){
 		if(typeOf(tables)==='string'){
 			tables = dv.table(tables)
 		}
 		if(typeOf(tables)!='array'){
-			tables = [tables]	
+			tables = [tables]
 		}
 		w.forEach(function(t){
-			
+
 			if(t.active() || t.invalid()){
 				var status = t.check_validity(tables);
 				if(status.valid){
-					t.sample_apply(tables);	
-					
+					t.sample_apply(tables);
+
 					var typeTransforms = dw.infer_type_transforms(tables[0]);
 					typeTransforms.forEach(function(tt){
 						tt.sample_apply([tables[0]])
 					})
-						
-					t.validate();		
+
+					t.validate();
 				}
 				else{
 					t.invalidate(status.errors);
 				}
 			}
-			
+
 
 		})
 		dw.summary.clear_cache();
 		return w;
 	}
-	
+
 	w.add = function(t){
 		w.push(t)
 		return w;
 	}
-	
+
 	return w;
 }
 var dw = dw || {};
@@ -893,9 +893,9 @@ dw.regex.description_length = function(regex){
 	return regex.length;
 }
 dw.regex.match = function(value, params){
-	
+
 	if(!value) return ""
-	
+
 	var max_splits = params.max_splits;
 	if(max_splits===undefined) max_splits = 1;
 
@@ -921,12 +921,12 @@ dw.regex.match = function(value, params){
 			break
 		}
 		numSplit++;
-		if(numSplit > 1000){
-			
+		if(numSplit > 10000){
+
 			break;
 		}
 	}
-	
+
 	splits.push(remainder_to_split)
 
 
@@ -951,15 +951,15 @@ dw.regex.match = function(value, params){
 	}
 	newSplits.push({start:0, end:prefix.length, value:prefix})
 
-	
+
 
 	return newSplits;
 }
 
 dw.regex.matchOnce = function(value, params){
-	
+
 	var positions = params.positions;
-	var splits = [];	
+	var splits = [];
 
 	if(positions && positions.length){
 		if(positions.length==2){
@@ -967,7 +967,7 @@ dw.regex.matchOnce = function(value, params){
 				var split_start = positions[0]
 				var split_end = positions[1]
 				splits.push({start:0, end:split_start, value:value.substr(0, split_start)});
-				splits.push({start:split_start, end:split_end, value:value.substr(split_start, split_end-split_start)})			
+				splits.push({start:split_start, end:split_end, value:value.substr(split_start, split_end-split_start)})
 				splits.push({start:split_end, end:value.length, value:value.substr(split_end)})
 
 				return splits;
@@ -976,50 +976,50 @@ dw.regex.matchOnce = function(value, params){
 
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	var before = params.before;
 	var after = params.after;
 	var on = params.on
 	var ignore_between = params.ignore_between;
-	
+
 
 	var remainder = value;
 	var remainder_offset = 0;
 	var start_split_offset = 0;
 	var add_to_remainder_offset = 0;
-	
-	
+
+
 	while(remainder.length){
 
 		var valid_split_region = remainder;
 		var valid_split_region_offset = 0;
-		
+
 
 		start_split_offset = remainder_offset;
-		
-		
+
+
 		if(ignore_between){
-			
+
 			var match = remainder.match(ignore_between);
 			if(match){
-				
+
 				valid_split_region = valid_split_region.substr(0, match.index)
 				remainder_offset += match.index+match[0].length;
 				remainder = remainder.substr(match.index+match[0].length)
-				
+
 			}
 			else{
 				remainder = ''
 			}
-		
+
 		}
 		else{
 			remainder = ''
 		}
-	
+
 		if(after){
 			var match = valid_split_region.match(after)
 			if(match){
@@ -1040,27 +1040,27 @@ dw.regex.matchOnce = function(value, params){
 				continue;
 			}
 		}
-	
+
 
 		var match = valid_split_region.match(on)
 		if(match){
-			
+
 			var split_start = start_split_offset + valid_split_region_offset+match.index;
 			var split_end = split_start + match[0].length;
-			
+
 			splits.push({start:0, end:split_start, value:value.substr(0, split_start)});
-			splits.push({start:split_start, end:split_end, value:value.substr(split_start, split_end-split_start)})			
+			splits.push({start:split_start, end:split_end, value:value.substr(split_start, split_end-split_start)})
 			splits.push({start:split_end, end:value.length, value:value.substr(split_end)})
 			return splits;
-			
+
 		}
 		continue;
-	
+
 	}
 
 	return [{start:0, end:value.length, value:value}]
-	
-	
+
+
 }
 dw.copy = function(column){
 	var t = dw.map(column);
@@ -1068,7 +1068,7 @@ dw.copy = function(column){
 	t.well_defined = function(table){
 		return t._column.length === 1;
 	}
-	
+
 	t.transform = function(values){
 
 
@@ -1083,11 +1083,11 @@ dw.copy = function(column){
 			dw.column_clause(t, t._column, 'column')
 		]
 	}
-	
+
 
 
 	t.name = dw.transform.COPY;
-	
+
 	return t;
 }
 dw.cut = function(column){
@@ -1095,8 +1095,8 @@ dw.cut = function(column){
 	t._drop = false;
 	t._update = true;
 	t.transform = function(values){
-		
-		
+
+
 		if(values[0]===undefined) return []
 		if(t._positions && t._positions.length){
 			var val = ""+values[0]
@@ -1108,7 +1108,7 @@ dw.cut = function(column){
 			return splitValues;
 		}
 		else{
-			
+
 			var val;
 			var z = [];
 			for(var v = 0; v < values.length; ++v){
@@ -1119,24 +1119,24 @@ dw.cut = function(column){
 				cutValues.stats = [];
 				for(var i = 0; i < cuts.length; ++i){
 					if(i%2==0){
-						cutValues.push(cuts[i].value)					
+						cutValues.push(cuts[i].value)
 
 					}
 					else{
-						cutValues.stats.push({splits:[{start:cuts[i].start, end:cuts[i].end}]})					
+						cutValues.stats.push({splits:[{start:cuts[i].start, end:cuts[i].end}]})
 					}
 				}
 
 				z.push(cutValues.join(''));
-				
+
 				if(!v) z.stats = cutValues.stats;
-				
-			}			
+
+			}
 
 			return z;
 		}
 	}
-	
+
 	t.description = function(){
 
 		var cutStart = (t._column && t._column.length) ? 'Cut from' : 'Cut';
@@ -1155,18 +1155,18 @@ dw.cut = function(column){
 
 	}
 
-		
-	
+
+
 
 	t.name = dw.transform.CUT;
-	
+
 	return t;
 }
 dw.drop = function(column){
 	var t = dw.transform(column);
 	t._drop = true;
 	dv.ivar(t, [])
-	
+
 	t.description = function(){
 		return [
 			'Drop',
@@ -1186,11 +1186,11 @@ dw.drop = function(column){
 			})
 		}
 
-			
 
-	
+
+
 		return {droppedCols:columns}
-		
+
 	}
 	t.name = dw.transform.DROP;
 	return t;
@@ -1221,31 +1221,31 @@ dw.extract = function(column){
 					extractValues.stats.push({splits:[{start:extracts[i].start, end:extracts[i].end}]})
 				}
 			}
-			
 
-			
+
+
 			return extractValues;
 		}
 	}
-	
+
 	t.description = function(){
-		
+
 		var description = [
 			'Extract from',
 			dw.column_clause(t, t._column, 'column', {editor_class:'none'})
 		]
-		
+
 		regex = t.match_description({editor_class:'extract'});
-		
+
 		description = description.concat(regex)
-		
-		
+
+
 		return description;
-		
+
 	}
 
 	t.name = dw.transform.EXTRACT;
-	
+
 	return t;
 }
 dw.LEFT = 'left';
@@ -1267,18 +1267,18 @@ dw.fill = function(column){
 		}
 		return 0;
 	}
-	
+
 	t.description = function(){
 		return [
 			'Fill',
 			dw.column_clause(t, t._column, 'column', {all_columns:true}),
 			dw.row_clause(t, t._row, 'row', {editor_class:'updatedColumn'}),
 			'with',
-			
-			
+
+
 			'values from',
 			dw.select_clause(t, {select_options:{'right':'the left', 'left':'the right', 'up':'below', 'down':'above'}, param:'direction'})
-			
+
 		]
 	}
 
@@ -1305,9 +1305,9 @@ dw.fill = function(column){
 						v = col[i];
 						if(dw.is_missing(v)) {
 							if(row.test(table, i)){
-								col[i] = fillValue	
+								col[i] = fillValue
 							}
-							
+
 						}
 						else fillValue = v;
 					}
@@ -1335,80 +1335,80 @@ dw.fill = function(column){
 							v = col[i];
 							if(dw.is_missing(v)) col[i] = fillValue;
 							else fillValue = v;
-						}		
+						}
 					}
 				}
 			}
 			else if(direction === dw.UP){
 				for(var c = 0; c < columns.length; ++c){
 					col = columns[c]
-					fillValue = undefined;					
+					fillValue = undefined;
 					for(var i = end_row-1; i >= start_row; --i){
 						v = col[i];
 						if(dw.is_missing(v)){
-							
+
 							if(row.test(table, i)){
-								col[i] = fillValue	
+								col[i] = fillValue
 							}
-							
+
 						}
 						else fillValue = v;
 					}
 				}
 			}
-		}	
-		
+		}
+
 		return {updatedCols:columns}
-		
+
 	}
-	
-	
+
+
 	t.horizontal = function(){
 		return t._direction===dw.LEFT || t._direction===dw.RIGHT;
 	}
-	
+
 	t.well_defined = function(table){
-		
-		
-	
-	
+
+
+
+
 		var columns = t.columns(table);
-		
+
 		var horizontal = t.horizontal();
-	
-	
+
+
 					if(t._row){
 						var conditions = t._row.conditions();
 
 						if(conditions.length===1){
 							if(conditions[0].name===dw.row.INDEX){
-							
+
 							}
 							else if(conditions[0].name===dw.row.EMPTY){
 								return false;
 							}
 						}
 					}
-	
-		
+
+
 		if(t.horizontal()){
-	
-	
-	
+
+
+
 			if(columns.length === 1){
 						return false;
 			}
-			
-			
-			
+
+
+
 			var col, seenMissingAfterNonMissing=false, seenNonMissing=false;
-			
 
-			
+
+
 			if(t._row===undefined){
-				
 
-			
+
+
 				if(t._direction===dw.LEFT){
 					for(var i = 0; i < columns.length;++i){
 						col = columns[i];
@@ -1422,7 +1422,7 @@ dw.fill = function(column){
 							seenNonMissing=true;
 						}
 					}
-				
+
 				}
 				else if(t._direction===dw.RIGHT){
 					for(var i = columns.length-1; i >=0 ;--i){
@@ -1437,44 +1437,44 @@ dw.fill = function(column){
 							seenNonMissing=true;
 						}
 					}
-				
+
 				}
-			
+
 
 				if(!seenMissingAfterNonMissing) return false;
 			}
-			
-			
-		
-			
-			
+
+
+
+
+
 		}
 		else{
-			
+
 			var missingCols = columns.filter(function(col){
 				var missing = dw.summary(col)['missing'];
 				return missing.length === 0;
 			});
 			if(missingCols.length)
 				return false;
-			
-	
+
+
 
 		}
-		
-		
-		
-		
-	
-	
-		
+
+
+
+
+
+
+
 		return true;
 	}
-	
+
 	t.enums = function(table){
 		return ['direction'];
 	}
-	
+
 	t.name = dw.transform.FILL;
 	return t;
 }
@@ -1570,7 +1570,7 @@ dw.fold = function(column){
 			dw.column_clause(t, t._column, 'column'),
 			' using ',
 			dw.key_clause(t, t._keys.map(function(c){return c===-1?'header' : c }), 'keys', {editor_class:'fold', clean_val:function(x){return Number(x)}}),
-			
+
 			(t._keys.length===1? 'as a key' : ' as keys ')
 		]
 	}
@@ -1587,7 +1587,7 @@ dw.fold = function(column){
 			values,
 			newCols,
 			start_row = options.start_row || 0,
-			end_row = options.end_row || rows;			
+			end_row = options.end_row || rows;
 
 
 		end_row = Math.min(end_row, rows)
@@ -1600,9 +1600,9 @@ dw.fold = function(column){
 				return a;
 			}, [])
 		})
-		
 
-		
+
+
 
 		var keyCols = dv.range(keys[0].length).map(function(k){
 			var x = [];
@@ -1630,11 +1630,11 @@ dw.fold = function(column){
 			x.type = c.type;
 			return x;
 		})
-		
+
 
 
 		var v;
-		
+
 		for(var row = start_row; row < end_row; ++row){
 
 			if(t._keys.indexOf(row)===-1){
@@ -1651,13 +1651,13 @@ dw.fold = function(column){
 				}
 			}
 		}
-		
+
 
 
 		var updateIndex = updateCol ? updateCol.index() : 0;
-		
 
-		
+
+
 		while(table.cols()){
 			table.removeColumn(0);
 		}
@@ -1671,43 +1671,43 @@ dw.fold = function(column){
 
 			table.addColumn(c.name, c, c.type, c.wrangler_type, c.wrangler_role, {index:updateIndex+i})
 		})
-			
+
 		return {keyCols:keyCols, valueCols:[valueCol], toValueCols:columns, keyRows:t._keys}
-		
-		
+
+
 	}
 
 	t.well_defined = function(table){
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		return true;
 	}
-	
 
 
 
-	t.name = dw.transform.FOLD;	
+
+	t.name = dw.transform.FOLD;
 	return t;
 }
 dw.map = function(column){
 	var t = dw.transform(column);
 	dv.ivar(t, [{name:'result', initial:dw.COLUMN},{name:'update', initial:false},{name:'insert_position', initial:dw.INSERT_RIGHT},{name:'row', initial:undefined}])
-	
-	
+
+
 	t.apply = function(tables, options){
 		options = options || {};
 		var table = t.getTable(tables),
@@ -1717,10 +1717,10 @@ dw.map = function(column){
 			end_row = options.end_row || rows,
 			row = t._row;
 
-		
+
 		var updater = dw.transform.tableUpdate(t, table, columns), numrows;
 
-		
+
 		for(var i = start_row; i < end_row; ++i){
 			if(!row || row.test(table, i)){
 				values = [];
@@ -1731,34 +1731,34 @@ dw.map = function(column){
 				valueStats.push(transformedValues.stats);
 				numrows = updater.update(i, transformedValues);
 
-				if(numrows > 1000){
+				if(numrows > 10000){
 					break;
 				}
 			}
 
 		}
-		
+
 		updater.finish();
-		
+
 		transformStats = updater.stats();
 		transformStats.valueStats = valueStats;
 		return transformStats;
 	}
-	
+
 	return t;
 }
 dw.merge = function(column){
 	var t = dw.map(column);
 	dv.ivar(t, [{name:'glue', initial:''}])
-	
+
 	t.transform = function(values){
 
-		
+
 		var	glue = t.glue();
-		
-		
-		
-		
+
+
+
+
 		var v = values.filter(function(v){return v!=undefined}).join(glue)
 
 		return [v];
@@ -1773,13 +1773,13 @@ dw.merge = function(column){
 			dw.input_clause(t, 'glue')
 		]
 	}
-	
+
 	t.well_defined = function(table){
 		return t._column.length > 1;
 	}
 
 	t.name = dw.transform.MERGE;
-	
+
 	return t;
 }
 dw.wrap = function(row){
@@ -1901,22 +1901,22 @@ dw.reduce = function(column){
 			compress = table.slice(0, table.rows(), {compress:true}),
 			columns = t.columns(table),
 			names = columns.map(function(c){return c.name}),
-			rows = table.rows(), newIndex = 0, col, values, reduce = {};			
-		
-		
+			rows = table.rows(), newIndex = 0, col, values, reduce = {};
+
+
 		var x = table.query({dims:names, vals:t._measures.map(function(m){return dv.first(m)})});
 
 
 
 		table = dv.table([]);
-		
 
-			
+
+
 		return {};
-		
-		
+
+
 	}
-	t.name = dw.transform.UNFOLD;	
+	t.name = dw.transform.UNFOLD;
 	return t;
 }
 dw.row = function(conditions){
@@ -1925,17 +1925,17 @@ dw.row = function(conditions){
 	dv.ivara(t, [
 		{name:'conditions', initial:conditions || []}
 	])
-	
+
 	t.description_length = function(){
-			
+
 			if(t._conditions.length===0){
 				return 0;
 			}
-			
+
 			if(t._conditions.length === 1){
 				switch(t._conditions[0].name){
 					case dw.row.INDEX:
-						return 1				
+						return 1
 					case dw.row.EMPTY:
 						return 2;
 					default:
@@ -1947,16 +1947,16 @@ dw.row = function(conditions){
 
 			return 3;
 	}
-	
 
-	
+
+
 	t.description = function(){
 		if(t._conditions.length === 1){
 			switch(t._conditions[0].name){
 				case dw.row.INDEX:
 				case dw.row.CYCLE:
 				case dw.row.EMPTY:
-					return t._conditions[0].description({simple:true})				
+					return t._conditions[0].description({simple:true})
 				default:
 					break
 			}
@@ -1968,15 +1968,15 @@ dw.row = function(conditions){
 			' rows where ' + t._conditions.map(function(c){return c.description()}).join(' and ')
 		]
 	}
-	
+
 	t.formula = function(){
 		return t._conditions.map(function(condition){
 			return condition.description();
 		}).join(' and ')
 	}
-	
+
 	t.valid_columns = function(tables){
-		
+
 		var conds = t._conditions, cond, v;
 		for(var i = 0; i < conds.length; ++i){
 			cond = conds[i];
@@ -1990,7 +1990,7 @@ dw.row = function(conditions){
 	}
 
 	t.test = function(tables, row){
-		
+
 		var conds = t._conditions, cond;
 		for(var i = 0; i < conds.length; ++i){
 			cond = conds[i];
@@ -2006,11 +2006,11 @@ dw.row = function(conditions){
 }
 
 dw.row.fromFormula = function(formula){
-	
+
 	if(formula===''){
 		return dw.row([])
 	}
-	
+
 	var preds = formula.split(/ & /g)
 	var index;
 	preds = preds.map(function(pred){
@@ -2023,13 +2023,13 @@ dw.row.fromFormula = function(formula){
 			indices = indices.split(/,/g).map(function(i){return Number(i)-1});
 			return dw.rowIndex(indices);
 		}
-		
+
 		var match = pred.match(/\=|<\=|>\=|!=|is null|is not|matches role|matches type|like/)
 		var op = match[0], index = match.index, cond, lhs = pred.substr(0, index).replace(/^ */, '').replace(/ *$/,''), rhs = pred.substr(index+op.length).replace(/^ * /,'').replace(/ *$/, '');
-		
-		
-		
-		
+
+
+
+
 		switch(rhs){
 			case 'a number':
 				rhs = dw.number();
@@ -2047,8 +2047,8 @@ dw.row.fromFormula = function(formula){
 				if(rhs[0]==="'") rhs = rhs.substring(1, rhs.length-1);
 				else rhs = Number(rhs)
 		}
-		
-		
+
+
 		switch(op){
 			case "=":
 				cond = dw.eq(lhs, rhs, true);
@@ -2067,19 +2067,19 @@ dw.row.fromFormula = function(formula){
 				break;
 			case "!=":
 				cond = dw.neq(lhs, rhs, true);
-				break;	
+				break;
 			case "is null":
 				cond = dw.is_null(lhs);
-				break;				
+				break;
 			case "matches role":
 				cond = dw.matches_role(lhs);
-				break;				
+				break;
 			case "is not":
-				
+
 				cond = dw.matches_type(lhs, rhs);
 				break;
 			case "matches type":
-				
+
 				cond = dw.matches_type(lhs);
 				break;
 			case "~":
@@ -2115,29 +2115,29 @@ dw.rowIndex = function(indices){
 
 		return t._indices.indexOf(row) != -1
 	}
-	
+
 	t.description = function(o){
 		o = o || {}, indices = t._indices;
 
 		var simple = o.simple || false;
 		if(simple){
 
-			return (indices.length === 1 ? (indices[0]===-1 ? '' : 'row ') : 'rows ') + indices.map(function(i){return i===-1?'header':(i+1)}).join(',')	
+			return (indices.length === 1 ? (indices[0]===-1 ? '' : 'row ') : 'rows ') + indices.map(function(i){return i===-1?'header':(i+1)}).join(',')
 		}
 		else{
-			
-			
-			
-			return 'index in (' + indices.map(function(i){return i+1}).join(',') + ')'	
+
+
+
+			return 'index in (' + indices.map(function(i){return i+1}).join(',') + ')'
 		}
 	}
-	
+
 	t.valid_columns = function(){
 		return {valid:true};
 	}
-	
+
 	t.name = dw.row.INDEX;
-	
+
 	return t;
 }
 
@@ -2149,9 +2149,9 @@ dw.rowCycle = function(cycle, start, end){
 		{name:'start', initial:start || 0},
 		{name:'end', initial:end}
 	])
-	
 
-	
+
+
 	t.test = function(table, row){
 		var e = t.end(), s = t.start();
 		if((s === undefined || row >= s) && (e === undefined || row <= e))
@@ -2162,9 +2162,9 @@ dw.rowCycle = function(cycle, start, end){
 
 		var simple = o.simple || false;
 		if(simple){
-			
+
 			var qualifier = '';
-			
+
 			if(t.start() && t.end()!=undefined){
 				qualifier = ' between ' + (t.start()+1) + ',' + (t.end()+1);
 			}
@@ -2174,14 +2174,14 @@ dw.rowCycle = function(cycle, start, end){
 			else if(t.end()){
 				qualifier = ' before ' + (t.end()+1);
 			}
-			
-			
+
+
 			return 	' every ' + t.cycle() + ' rows ' + qualifier
 		}
 		else{
-			
+
 			var qualifier = '';
-			
+
 			if(t.start() && t.end()!=undefined){
 				qualifier = ' between ' + (t.start()+1) + ',' + (t.end()+1);
 			}
@@ -2191,58 +2191,58 @@ dw.rowCycle = function(cycle, start, end){
 			else if(t.end()){
 				qualifier = ' before ' + (t.end()+1);
 			}
-			
-			
-			return 'every ' + t.cycle() + ' rows' + qualifier;	
+
+
+			return 'every ' + t.cycle() + ' rows' + qualifier;
 		}
 	}
-	
+
 	t.valid_columns = function(){
 		return {valid:true};
 	}
-	
+
 	t.name = dw.row.CYCLE;
-	
+
 	return t;
 }
 
 dw.vcompare = function(lcol, value){
 	var t = dw.transform();
-	
+
 	dv.ivar(t, [
 		{name:'lcol', initial:lcol},{name:'value', initial:value}
 	])
-	
-	
+
+
 	t.test = function(table, row){
 		return t.compare(table[t._lcol][row], value)
 	}
-	
+
 	t.description = function(){
 		return dw.display_name(t._lcol) + " " + t._op_str + " '"  + t._value + "'";
 	}
-	
+
 	t.valid_columns = function(tables){
 		if(tables[0][lcol])
 			return {valid:true};
 		return {valid:false, errors:['Invalid left hand side']}
 	}
-	
+
 	return t;
 }
 
 dw.ccompare = function(lcol, rcol){
 	var t = dw.transform();
-	
+
 	dv.ivar(t, [
 		{name:'lcol', initial:lcol},{name:'rcol', initial:rcol}
 	])
-	
-	
+
+
 	t.test = function(table, row){
 		return t.compare(table[lcol][row], table[rcol][row])
 	}
-	
+
 	t.description = function(){
 		return dw.display_name(t._lcol) + " " + t._op_str + " "  + t._rcol;
 	}
@@ -2253,14 +2253,14 @@ dw.ccompare = function(lcol, rcol){
 		return {valid:false, errors:['Invalid comparison']}
 	}
 
-	
+
 	return t;
 }
 
 dw.compare = function(lcol, rcol, value){
-	
 
-	
+
+
 	var t = value ? dw.vcompare(lcol, rcol) : dw.ccompare(lcol, rcol);
 	t.default_transform = function(){
 		return dw[t.name](lcol, rcol, value)
@@ -2269,50 +2269,50 @@ dw.compare = function(lcol, rcol, value){
 }
 
 dw.eq = function(l, r, v){
-	
+
 	var t = dw.compare(l ,r, v);
-	
+
 	t._op_str = '='
-	
+
 	t.compare = function(a, b){
 		return a === b;
 	}
-	
+
 	t.name = dw.row.EQUALS;
-	
+
 	return t;
 }
 
 dw.neq = function(l, r, v){
-	
+
 	var t = dw.compare(l ,r, v);
-	
+
 	t._op_str = '!='
-	
+
 	t.compare = function(a, b){
 		return a != b;
 	}
-	
+
 	t.name = dw.row.NOT_EQUALS;
-	
+
 	return t;
 }
 
 
 dw.starts_with = function(l, r, v){
 	var t = dw.compare(l ,r, v);
-	
+
 	t._op_str = 'starts with'
-	
+
 	t.compare = function(a, b){
 		a = ""+a
 		b = ""+b
 
 		return a.indexOf(b)==0;
 	}
-	
+
 			t.name = dw.row.STARTS_WITH;
-	
+
 	return t;
 }
 
@@ -2324,46 +2324,46 @@ dw.like = function(l, r, v){
 		b = ""+b
 		return a.match(b)!=null;
 	}
-	
+
 	t.name = dw.row.LIKE;
-	
+
 	return t;
 }
 
 
 dw.contains = function(l, r, v){
 	var t = dw.compare(l ,r, v);
-	
+
 	t._op_str = 'contains'
-	
+
 	t.compare = function(a, b){
 		a = ""+a
 		b = ""+b
 
 		return a.indexOf(b)!=-1;
 	}
-	
+
 	t.name = dw.row.CONTAINS;
-	
+
 	return t;
 }
 
 dw.is_null = function(l, r, v){
 	var t = dw.compare(l ,r, true);
-	
+
 	t._op_str = 'is null'
-	
+
 	t.compare = function(a, b){
 		return dw.is_missing(a);
 	}
-	
+
 	t.description = function(){
 
 		return dw.display_name(t._lcol) + ' ' +  t._op_str;
 
-		
+
 	}
-		t.name = dw.row.IS_NULL;	
+		t.name = dw.row.IS_NULL;
 	return t;
 }
 
@@ -2371,28 +2371,28 @@ dw.is_null = function(l, r, v){
 
 dw.matches_role = function(lcol){
 	var t = dw.transform();
-	
+
 	dv.ivar(t, [
 		{name:'lcol', initial:lcol}
 	])
-		
+
 	t.test = function(table, row){
 		return (table[lcol].wrangler_role.parse(table[lcol][row])===undefined);
 	}
-	
+
 	t.description = function(){
 		return dw.display_name(t._lcol) + ' does not match role';
 	}
 	t.name = dw.row.MATCHES_ROLE;
-	
-	
+
+
 	t.valid_columns = function(tables){
 		if(tables[0][lcol])
 			return {valid:true};
 		return {valid:false, errors:['Invalid comparison']}
 	}
-	
-			
+
+
 	return t;
 }
 
@@ -2402,13 +2402,13 @@ dw.matches_type = function(lcol, type){
 		{name:'lcol', initial:lcol},
 		{name:'type', initial:type}
 	])
-	
+
 
 	t.test = function(table, row){
 		var wt = t._type || table[lcol].wrangler_type;
 		return !wt || (wt.parse(table[t._lcol][row])===undefined);
 	}
-	
+
 	t.description = function(){
 		return dw.display_name(t._lcol) + ' is not a ' + type.name;
 	}
@@ -2420,7 +2420,7 @@ dw.matches_type = function(lcol, type){
 	}
 
 
-		t.name = dw.row.MATCHES_TYPE;	
+		t.name = dw.row.MATCHES_TYPE;
 	return t;
 }
 
@@ -2438,7 +2438,7 @@ dw.empty = function(){
 		{name:'percent_valid', initial:0},
 		{name:'num_valid', initial:0}
 	])
-	
+
 	t.test = function(table, row){
 		var v;
 
@@ -2459,7 +2459,7 @@ dw.empty = function(){
 
 		return 0;
 	}
-	
+
 	t.description = function(o){
 		o = o || {};
 		var simple = o.simple || false;
@@ -2475,7 +2475,7 @@ dw.empty = function(){
 				return 'rows with <= ' + num_valid + ' values'
 			}
 			else {
-				return 'empty rows'	
+				return 'empty rows'
 			}
 		}
 		else{
@@ -2489,19 +2489,19 @@ dw.empty = function(){
 				return ' row is empty '
 			}
 		}
-		
+
 
 	}
-	
+
 	t.valid_columns = function(tables){
-	
+
 			return {valid:true};
-	
+
 	}
-	
-	
+
+
 	t.name = dw.row.EMPTY;
-	
+
 	return t;
 }
 dw.set_role = function(column, roles){
@@ -3014,14 +3014,14 @@ dw.translate = function(column){
 		}
 		return 0;
 	}
-	
+
 	t.description = function(){
 		return [
 			'Translate',
 			dw.column_clause(t, t._column),
 			dw.select_clause(t, {select_options:{'up':'up', 'down':'down'}, param:'direction'})
-			
-			
+
+
 		]
 	}
 
@@ -3033,11 +3033,11 @@ dw.translate = function(column){
 			values,
 			method = t._method,
 			direction = t._direction;
-		
+
 		var newCols = []
 		columns.forEach(function(col){
 			var index = col.index();
-			
+
 			if(t._direction===dw.DOWN)
 			var newValues;
 			switch(t._direction){
@@ -3054,22 +3054,22 @@ dw.translate = function(column){
 			newValues.type = col.type;
 			newValues.wrangler_type = col.wrangler_type;
 			newValues.wrangler_role = col.wrangler_role;
-			table.addColumn(newValues.name, newValues, newValues.type, newValues.wrangler_type, newValues.wrangler_role, {index:index+1});	
+			table.addColumn(newValues.name, newValues, newValues.type, newValues.wrangler_type, newValues.wrangler_role, {index:index+1});
 			newCols.push(newValues)
 		})
-		
-		return {newCols:newCols}
-		
-	}
-	
-	
 
-	
-	
+		return {newCols:newCols}
+
+	}
+
+
+
+
+
 	t.enums = function(table){
 		return ['direction'];
 	}
-	
+
 	t.name = dw.transform.TRANSLATE;
 	return t;
 }
@@ -3102,9 +3102,9 @@ dw.split = function(column){
 			}
 			var params = {which:t._which, max_splits:t._max, before:t._before,after:t._after,on:t._on,ignore_between:ignore_between || t._ignore_between}
 			var splits = dw.regex.match(values[0], params);
-			
 
-			
+
+
 			var splitValues = [];
 			splitValues.stats = [];
 			for(var i = 0; i < splits.length; ++i){
@@ -3115,14 +3115,14 @@ dw.split = function(column){
 					splitValues.stats.push({splits:[{start:splits[i].start, end:splits[i].end}]})
 				}
 			}
-			
-			
+
+
 			return splitValues;
 		}
 	}
-	
+
 	t.description = function(table){
-		
+
 		var description = [
 			'Split',
 			dw.column_clause(t, t._column, 'column', {editor_class:'none'})
@@ -3135,7 +3135,7 @@ dw.split = function(column){
 		}
 		regex = t.match_description();
 
-	
+
 		description = description.concat(regex)
 
 		if(t._result === dw.ROW){
@@ -3143,16 +3143,16 @@ dw.split = function(column){
 			description = description.concat(dw.select_clause(t, {select_options:{'row':'rows'}, param:'result'}))
 		}
 
-		
-		
+
+
 		return description;
-		
+
 	}
-	
-	
+
+
 
 	t.name = dw.transform.SPLIT;
-	
+
 	return t;
 }
 dw.textPattern = function(column){
@@ -3167,22 +3167,22 @@ dw.textPattern = function(column){
 	t.well_defined = function(){
 		return ((t._positions && !t._on && !t._before && !t._after) || (!t._positions && (t._on || t._before || t._after))) && !t._row;
 	}
-	
+
 	t.description_length = function(){
 		if(t._positions) return 0;
 		var score = dw.regex.description_length(t._on)+ dw.regex.description_length(t._before) + dw.regex.description_length(t._after)
-		
+
 
 
 		return score;
-		
+
 	}
-	
-	
+
+
 	t.check_validity = function(tables){
 		var x = t.valid_columns(tables);
 		if(x.valid) {
-			
+
 			if(t.well_defined()){
 				return {valid:true}
 			}
@@ -3194,19 +3194,19 @@ dw.textPattern = function(column){
 			return x;
 		}
 	}
-	
+
 	t.match_description = function(options){
 		options = options || {}
 		var description = [];
-		
+
 		if(t._positions){
 			return [
 				'between positions',
 				dw.column_clause(t, t._positions, options)
 			]
 		}
-		
-		
+
+
 		if(t._on && t._on.toString()!="/.*/"){
 
 			description = description.concat(
@@ -3214,7 +3214,7 @@ dw.textPattern = function(column){
 					'on',
 					dw.regex_clause(t,'on', options)
 				]
-				
+
 			)
 		}
 		if(t._before && !t._after){
@@ -3224,7 +3224,7 @@ dw.textPattern = function(column){
 					dw.regex_clause(t, 'before', options)
 				]
 			)
-		}		
+		}
 		if(t._after && !t._before){
 			description = description.concat(
 				[
@@ -3245,103 +3245,103 @@ dw.textPattern = function(column){
 		}
 		return description;
 	}
-			
+
 	return t;
 }
 dw.edit = function(column){
 	var t = dw.textPattern(column);
 	t._update = true;
 	dv.ivar(t, [{name:'to', initial:undefined},{name:'update_method', initial:undefined}])
-	
 
-	
-	
+
+
+
 	t.transform = function(values){
 		var mapper;
 		if(t._to != undefined){
 			mapper = function(){return t._to;};
 		}
 		else if(t._update_method){
-			
+
 			switch(t._update_method){
 				case dw.edit.upper:
 					mapper = function(v){
 						if(v!=undefined){}
-							return v.toUpperCase();						
+							return v.toUpperCase();
 					}
 					break
 				case dw.edit.lower:
 					mapper = function(v){
 						if(v!=undefined){
-							return v.toLowerCase();	
+							return v.toLowerCase();
 						}
-							
+
 					}
 					break
 				case dw.edit.capitalize:
 					mapper = function(v){
 						if(v!=undefined)
 							if(v.length >= 1)
-								return v[0].toUpperCase()+v.substr(1);						
+								return v[0].toUpperCase()+v.substr(1);
 						}
 					break
 				case dw.edit.uncapitalize:
 					mapper = function(v){
 						if(v!=undefined)
 							if(v.length >= 1)
-								return v[0].toLowerCase()+v.substr(1);						
+								return v[0].toLowerCase()+v.substr(1);
 						}
 					break
 				default:
 					throw('Illegal update update_method');
 			}
 		}
-		
+
 		return values.map(function(v){return v!=undefined?''+v:undefined}).map(mapper);
-		
+
 	}
-	
+
 	t.description = function(){
-		
+
 		var description = [
 			'Edit',
 			dw.column_clause(t, t._column, 'column', {editor_class:'none'})
 		]
-		
+
 		regex = t.match_description();
 
-	
+
 		description = description.concat(regex)
 
 		if(t._row){
 			description.push(dw.row_clause(t, t._row, 'row'))
 		}
-		
+
 		if(t._to != undefined){
 			description.push(' to \'')
-			description.push(dw.input_clause(t, 'to'));			
+			description.push(dw.input_clause(t, 'to'));
 			description.push('\'')
 		}
-		
+
 		else if(t._update_method){
 			description.push(dw.select_clause(t, {select_options:{'LOWER':' to lowercase','CAPITALIZE':' capitalize','UNCAPITALIZE':' uncapitalize', 'UPPER':'to uppercase'}, param:'update_method'}))
 		}
-		
-		
-		
+
+
+
 		return description;
-		
+
 	}
-	
+
 	t.well_defined = function(){
 
 		return (t._column.length===1 && (t._to != undefined || t._update_method != undefined));
 	}
-	
-	
+
+
 
 	t.name = dw.transform.EDIT;
-	
+
 	return t;
 }
 
@@ -3567,7 +3567,7 @@ dw.transform = function(column){
 	}
 
 	t.sample_apply = function(tables){
-		return t.apply(tables, {max_rows:1000, warn:true})
+		return t.apply(tables, {max_rows:10000, warn:true})
 	}
 
 	return t;
@@ -3732,13 +3732,13 @@ dw.unfold = function(column){
 			keyColumns = table.filter(function(c){return toHeaderNames.indexOf(c.name)===-1 && t._measure != c.name}),
 			rows = table.rows(), newIndex = 0,
 			valueCol = table[t._measure],
-			max_rows = options.max_rows || 1000,
+			max_rows = options.max_rows || 10000,
 			start_row = options.start_row || 0, end_row = options.end_row || rows;
-		
+
 		end_row = Math.min(rows, end_row);
 
-		
-		
+
+
 		end_row = rows;
 
 		var headerColumn = columns[0];
@@ -3749,14 +3749,14 @@ dw.unfold = function(column){
 				newColumnHeaders.push(e);
 			}
 		});
-	
+
 
 		var new_table = [];
 		keyColumns.forEach(function(e) {new_table.push([]);});
 
 		newColumnHeaders.forEach(function(e, i) {
 			var col = [];
-			
+
 			col.name = e;
 			new_table.push(col);
 		});
@@ -3796,14 +3796,14 @@ dw.unfold = function(column){
 				name = col.name
 			}
 			table.addColumn(name, col, dv.type.nominal);
-			
+
 			if (i >= keyColumns.length) {
 				valueCols.push(col.name);
 			}
 		});
 
-		
-		
+
+
 		for (var i = 0; i < table.cols(); i++) {
 			if (i >= keyColumns.length) {
 				table[i].nameIsMeaningful = true;
@@ -3816,26 +3816,26 @@ dw.unfold = function(column){
 
 
 
-	
+
 	t.description_length = function(){
 		return 0;
 	}
-	
+
 	t.well_defined = function(table){
 		if(t._column && t._column.length === 1 && t._measure && t._measure != t._column[0] && (!table || table.length >= 3)){
-			
+
 			var col = table[t._column[0]];
-			
-			
-			
-			
+
+
+
+
 
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	t.check_validity = function(tables){
 		var x = t.valid_columns(tables);
 		if(x.valid) {
@@ -3851,9 +3851,9 @@ dw.unfold = function(column){
 			return x;
 		}
 	}
-	
-	
-	t.name = dw.transform.UNFOLD;	
+
+
+	t.name = dw.transform.UNFOLD;
 	return t;
 }
 
@@ -3863,10 +3863,10 @@ dw.transpose = function(column){
 
 	])
 
-	t.description_length = function(){		
+	t.description_length = function(){
 		return 0;
 	}
-	
+
 	t.description = function(){
 		var d = [
 			'Transpose table'
@@ -3892,28 +3892,28 @@ dw.transpose = function(column){
 			x.type = dv.type.nominal;
 			return x;
 		});
-		
+
 		for(var c = 0; c < table.cols(); ++c){
 			var col = table[c];
 			for(var r = 0; r < table.rows(); ++r){
 				newcols[r][c] = col[r];
 			}
 		}
-		
+
 		while(table.cols()){
 			table.removeColumn(0);
 		}
-		
+
 		newcols.forEach(function(c){
 			table.addColumn(c.name, c, c.type, dw.string(), undefined, {})
 		})
-		
-		
+
+
 		return {};
 	}
-	
-	
-	
+
+
+
 	t.name = dw.transform.TRANSPOSE;
 	return t;
 }
@@ -3927,10 +3927,10 @@ dw.sort = function(column){
 	])
 
 	t.description_length = function(){
-		
+
 		return 0;
 	}
-	
+
 	t.description = function(){
 		var d = [
 			'Sort by ',
@@ -3961,9 +3961,9 @@ dw.sort = function(column){
 			if(!ct){
 				return dw.stringCompare;
 			}
-			
+
 			return ct.comparison();
-			
+
 		})
 
 		var directions = [];
@@ -3972,7 +3972,7 @@ dw.sort = function(column){
 			else directions.push(1);
 		}
 
-		
+
 		var sortFunction = function(a, b){
 			for(var i = 0; i < comparisons.length;++i){
 				var col = columns[i];
@@ -3986,9 +3986,9 @@ dw.sort = function(column){
 			if(a==b) return 0;
 			return 1;
 		}
-			
-		var sortedRows = dw.merge_sort(dv.range(0, table.rows()), sortFunction);	
-	
+
+		var sortedRows = dw.merge_sort(dv.range(0, table.rows()), sortFunction);
+
 		var newTable = table.slice();
 		for(var col = 0; col < table.length; ++col){
 			var column = table[col];
@@ -3997,15 +3997,15 @@ dw.sort = function(column){
 				column[row] = newColumn[sortedRows[row]];
 			}
 		}
-		
-		
-			
+
+
+
 		return {updatedCols:columns}
-		
+
 	}
-	
-	
-	
+
+
+
 	t.name = dw.transform.SORT;
 	return t;
 }
@@ -4017,28 +4017,28 @@ dw.preview = function(vtable, table, transform, afterTable, tableSelection){
 	var visible_rows = vtable.visible_rows(), start_row = Math.max(0, visible_rows[0]), end_row = Math.max(0, visible_rows[1]);
 
 	var sample = table.slice(), wrangler = dw.wrangle(), tableNames = table.names(), inputColumn, original, updated, colIndex;
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 
 	vtable.container().removeClass('previewBeforeTable').removeClass('updatedTable')
 	afterTable.container().removeClass('previewAfterTable').addClass('hidden').hide()
-	
 
 
-	
+
+
 	if(transform){
 		var oldDrop = transform.drop();
 		transform.drop(false);
-		
+
 		if(transform.name===dw.transform.CUT) transform.update(false)
-		
-		var tstats = transform.apply([sample], {max_rows:1000, start_row:start_row, end_row:end_row}),
+
+		var tstats = transform.apply([sample], {max_rows:10000, start_row:start_row, end_row:end_row}),
 			newCols = tstats.newCols || [],
 			updatedCols = tstats.updatedCols || [],
 			droppedCols = tstats.droppedCols || [],
@@ -4053,100 +4053,100 @@ dw.preview = function(vtable, table, transform, afterTable, tableSelection){
 			promoteRows = tstats.promoteRows || [],
 			splits = valueStats.map(function(v){if(v) return v[0] && v[0].splits})
 			effectedRows = tstats.effectedRows || [], columnTable = sample;
-			
+
 		if(transform.name===dw.transform.CUT) transform.update(true)
-			
-			
-			
-			
-		
+
+
+
+
+
 
 		switch(transform.name){
-			
+
 			case dw.transform.FOLD:
 			case dw.transform.UNFOLD:
 			case dw.transform.WRAP:
 			case dw.transform.TRANSPOSE:
-				vtable.container().addClass('previewBeforeTable')			
+				vtable.container().addClass('previewBeforeTable')
 				vtable.schema_table(table).table(table).draw()
 				afterTable.table(sample).draw()
 				afterTable.container().addClass('previewAfterTable').show()
-				
+
 				columnTable = table;
 			break
 			case dw.transform.FILTER:
 				vtable.container().addClass('updatedTable')
 				vtable.schema_table(table).table(table).draw()
 			break
-			
+
 			case dw.transform.SPLIT:
 			case dw.transform.CUT:
 			case dw.transform.EXTRACT:
 				highlightClass = transform.name+'Highlight'
 
-			
+
 			default:
 				vtable.container().addClass('updatedTable')
 				vtable.schema_table(table).table(sample).draw()
 
 		}
 
-	
-		
+
+
 		var colIndex, original, updated, children, node, val, split, rows;
 
-		
 
-		
+
+
 		transform.column().forEach(function(col){
 			original = columnTable[col];
 			colIndex = original.index();
 			children = jQuery('.updatedTable td:nth-child('+(colIndex+2)+')');
 
 			for(var index = 0; index < splits.length; ++index){
-				
+
 				split = splits[index];
-				
+
 				if(split){
 					node = children[index];
-					
+
 					if(node){
 						node = node.firstChild
 					}
 					else{
-						
+
 						break;
 					}
 					val = original[index+start_row];
-					
 
-					
+
+
 					if(node && val != undefined && split[0] && val.length >= split[0].end) {
 						Highlight.highlight(node, split[0].start, split[0].end, {highlightClass:highlightClass})
 					}
-					
+
 				}
-				
-				
+
+
 			}
-			
+
 		})
-		
+
 		newCols.forEach(function(col){
 			jQuery('.updatedTable td:nth-child('+(col.index()+2)+')').addClass( 'previewNew').addClass('unclickable');
 		})
-	
+
 		droppedCols.forEach(function(col){
 			jQuery('.updatedTable td:nth-child('+(col.index()+2)+')').addClass( 'previewDeleted');
 		})
-		
+
 		toHeaderCols.forEach(function(col){
 			colIndex = table[col.name].index()
 			jQuery('.previewBeforeTable td:nth-child('+(colIndex+2)+')').addClass( 'previewSchema');
-			
+
 		})
-		
-		
+
+
 		updatedCols.forEach(function(col){
 			original = table[col.name];
 			updated = sample[col.name];
@@ -4156,93 +4156,93 @@ dw.preview = function(vtable, table, transform, afterTable, tableSelection){
 			vtable.rows(function(r, i){
 				if(updated[i] != undefined && original[i] !== updated[i]) r.find('td:nth-child('+(colIndex+2)+')').addClass('previewNew')
 			}, range)
-			
-			
-			
-			
+
+
+
+
 		})
-		
-		
-		
-		
-		
+
+
+
+
+
 
 		vtable.rows(function(r){
 			r.addClass('previewDeleted')
 		}, effectedRows)
-		
+
 
 		vtable.rows(function(r){
 			r.addClass('previewKey')
 		}, promoteRows)
-		
+
 
 		toValueCols.forEach(function(col){
 			colIndex = table[col.name].index();
 			jQuery('.previewBeforeTable td:nth-child('+(colIndex+2)+')').addClass( 'previewNew');
-			
+
 			vtable.rows(function(r, i){
 				if(i===-1) jQuery('.previewBeforeTable tr:nth-child(2) th:nth-child('+(colIndex+2)+')').addClass( 'previewKey');
 				else r.find('td:nth-child('+(colIndex+2)+')').addClass('previewKey')
 			}, keyRows)
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+
+
+
+
+
+
+
+
+
+
 
 		})
-		
+
 		valueCols.forEach(function(col){
 			colIndex = sample[col.name].index();
 			jQuery('.previewAfterTable td:nth-child('+(colIndex+2)+')').addClass( 'previewNew');
-			
-			
-			
-			
-			
-			
+
+
+
+
+
+
 				afterTable.rows(function(r, i){
 					if(i===-1) jQuery('.previewAfterTable tr:nth-child(2) th:nth-child('+(colIndex+2)+')').addClass( 'previewKey');
 					else r.find('td:nth-child('+(colIndex+2)+')').addClass('previewKey')
 				}, toKeyRows)
-			
-			
-			
-			
-			
-			
-			
+
+
+
+
+
+
+
 		})
-		
+
 		keyCols.forEach(function(col){
 			colIndex = sample[col.name].index();
 			jQuery('.previewAfterTable td:nth-child('+(colIndex+2)+')').addClass( 'previewKey');
-			
+
 		})
 
-	
-	
-	
+
+
+
 		transform.drop(oldDrop);
 	}
 	else{
-		
+
 
 		vtable.schema_table(table).table(table).draw()
 	}
 	tableSelection.draw();
-	
+
 	jQuery('.unclickable').unbind('mouseup').unbind('mousedown')
 }
 dw.table_selection = function(vtable){
 	var ts = {}, rowSelection = dw.selection(), colSelection = dw.selection();
-	
+
 	ts.add = function(selection){
 		var keytype;
 		if(selection.shift){
@@ -4251,7 +4251,7 @@ dw.table_selection = function(vtable){
 		else if(selection.ctrl){
 			keytype = dw.selection.ctrl;
 		}
-		
+
 		switch(selection.type){
 			case dw.engine.row:
 				rowSelection.add({type:keytype, selection:selection.position.row})
@@ -4261,16 +4261,16 @@ dw.table_selection = function(vtable){
 				colSelection.add({type:keytype, selection:selection.table[selection.position.col].index()})
 				rowSelection.clear()
 				break
-			default:				
+			default:
 		}
 		return ts;
 	}
-	
+
 	ts.clear = function(){
 		rowSelection.clear();
 		colSelection.clear();
 	}
-	
+
 	ts.draw = function(){
 		vtable.rows(function(r){
 			r.addClass('selected')
@@ -4280,21 +4280,21 @@ dw.table_selection = function(vtable){
 		}, colSelection)
 		return ts;
 	}
-	
+
 	ts.selection = function(){
 		return {rows:rowSelection, cols:colSelection}
 	}
-	
+
 	ts.rows = function(){
 		return rowSelection.slice(0);
 	}
-	
+
 	ts.cols = function(){
 		return colSelection.slice(0);
 	}
-	
-	
-	
+
+
+
 	return ts;
 }
 
@@ -4324,7 +4324,7 @@ dw.selection = function(){
 							if(selection.indexOf(r) === -1){
 								selection.push(r)
 							}
-						})								
+						})
 					}
 				}
 				else{
@@ -4341,11 +4341,11 @@ dw.selection = function(){
 		history.push(s)
 		return selection;
 	}
-	
+
 	selection.clear = function(){
 		selection.add({type:dw.selection.clear})
 	}
-	
+
 	return selection;
 }
 
@@ -4392,7 +4392,7 @@ dw.vtable = function(container, options){
 
 		var col, c, r, v;
 
-		var max_cols = 40;
+		var max_cols = 100;
 		table = t.slice_cols(0, max_cols);
 		data = [];
 
@@ -4952,7 +4952,7 @@ dw.vtable = function(container, options){
 dw.wrangler_export = function(table, options){
 	options = options || {};
 	var format = options.format || 'csv';
-	
+
 	switch(format){
 		case 'csv':
 			return dw.wrangler_export.csv(table)
@@ -4969,20 +4969,20 @@ dw.wrangler_export = function(table, options){
 		case 'javascript':
 			return dw.wrangler_export.javascript(options.wrangler)
 	}
-	
+
 
 }
 
 dw.wrangler_export.csv = function(table){
 	var x = '';
-	
+
 	x+= table.names().map(dw.display_name).join(',')+'\n';
-	
+
 	for(var r = 0; r < table.rows(); ++r){
 		x+= table.row(r).join(',') + '\n'
 	}
 	return x;
-	
+
 }
 
 dw.wrangler_export.tsv = function(table){
@@ -4992,7 +4992,7 @@ dw.wrangler_export.tsv = function(table){
 		x+= table.row(r).join('\t') + '\n'
 	}
 	return x;
-	
+
 }
 
 
@@ -5001,11 +5001,11 @@ dw.wrangler_export.tsv = function(table){
 
 dw.wrangler_export.coljson = function(table){
 	var x = '[';
-	
-	
-	
 
-	
+
+
+
+
 	x += table.map(function(c){
 		var type;
 		switch(c.wrangler_type.name){
@@ -5029,61 +5029,61 @@ dw.wrangler_export.coljson = function(table){
 			return r
 		}).join(',') + "]}" + '\n';
 	}).join(',')
-	
-	
+
+
 	x+= ']'
-	
-	
+
+
 	return x;
-	
+
 }
 
 
 dw.wrangler_export.rowjson = function(table){
 	var x = '[', val;
 	for(var r = 0; r < table.rows(); ++r){
-	
+
 		if(r) x += ',\n'
-	
+
 		x+= '{' + table.map(function(c){
 			val = c[r];
 			if(val===undefined) val = '';
 			if(dw.is_missing(val)||isNaN(val)) val = val.quote()
 			return '"'+dw.display_name(c.name) + '"' + ": " + val;
-			
+
 		}).join(',') + '}'
-			
-	
+
+
 	}
-	
+
 	x+= ']';
 	return x;
-	
+
 }
 
 dw.wrangler_export.lookup_table = function(table){
 	var x = '{', val;
 	for(var r = 0; r < table.rows(); ++r){
-	
+
 		if(r) x += ',\n'
-	
+
 		x+= table.map(function(c, i){
 			val = c[r];
 			if(val===undefined) val = '';
 			if(i!=0){
-				if(dw.is_missing(val)||isNaN(val)) val = val.quote()	
+				if(dw.is_missing(val)||isNaN(val)) val = val.quote()
 			}
 			else val = val.quote()
 			return val;
-			
+
 		}).join(':')
-			
-	
+
+
 	}
-	
+
 	x+= '}';
 	return x;
-	
+
 }
 
 dw.wrangler_export.javascript = function(w){
@@ -5091,7 +5091,7 @@ dw.wrangler_export.javascript = function(w){
 		if(x===true) return 'true'
 		if(x===false) return 'false'
 		if(x===undefined) return 'undefined'
-		
+
 		if(typeOf(x)==='object' ||typeOf(x)==='function'){
 			if(x.is_transform){
 				return parse_javascript_transform(x)
@@ -5101,27 +5101,27 @@ dw.wrangler_export.javascript = function(w){
 
 		if(typeOf(x)==='array'){
 			return '['+x.map(parse_javascript_parameter)+']'
-		}		
+		}
 		return dw.JSON.stringify(x)
 	}
 
 	var parse_javascript_transform = function(t){
 		var constructor = 'dw.' + t.name + '()';
-		
+
 		var params = t.params().map(function(p){
 			return '.' + p.substr(1) + '(' + parse_javascript_parameter(t[p]) + ')\n'
 		}).join('\t')
-		
+
 		return constructor + params
 	}
-	
+
 	var preamble = ""
-	
+
 	var exportComment = '\n\n\/* apply transforms to data.  data can be a string, datatable or array of datatables *\/\n';
 	var exportCode = "w.apply(data)\n\
 \n\
 \n"
-	
+
 	var wrangler = 'w = dw.wrangle()\n'
 
 
@@ -5131,9 +5131,9 @@ dw.wrangler_export.javascript = function(w){
 		var comment = '\n\/* '+t.comment()+' *\/\n';
 		return comment+'w.add('+parse_javascript_transform(t)+')'
 
-		
+
 	}).join('\n') + exportComment+ exportCode
-	
+
 }
 
 dw.wrangler_export.python = function(w){
@@ -5151,27 +5151,27 @@ dw.wrangler_export.python = function(w){
 
 		if(typeOf(x)==='array'){
 			return '['+x.map(parse_python_parameter)+']'
-		}		
-		
+		}
+
 
 		return dw.JSON.stringify(x)
 	}
 
 	var parse_python_transform = function(t){
-		
 
-		
+
+
 		var n = t.name.split('_').map(function(c){return c.charAt(0).toUpperCase() + c.slice(1)}).join('');
 		var constructor = 'dw.' + n + '(';
-		
+
 		var params = t.params().map(function(p){
 			return  p.substr(1) + '=' + parse_python_parameter(t[p])
-			
+
 		}).join(',\n'+dv.range(0,10+n.length).map(function(){return ' '}).join(''))
-		
+
 		return constructor + params + ')'
 	}
-	
+
 	var preamble = "from wrangler import dw\n\
 import sys\n\
 \n\
@@ -5184,7 +5184,7 @@ if(len(sys.argv) < 3):\n\
 
 	var exportCode = "\n\nw.apply_to_file(sys.argv[1]).print_csv(sys.argv[2])\n\
 \n"
-	
+
 	var wrangler = 'w = dw.DataWrangler()\n'
 
 
@@ -5194,9 +5194,9 @@ if(len(sys.argv) < 3):\n\
 		var comment = '\n# '+t.comment()+'\n';
 		return comment + 'w.add('+parse_python_transform(t)+')'
 
-		
+
 	}).join('\n') + exportCode
-	
+
 }
 
 if (!String.prototype.quote) {
@@ -5237,11 +5237,11 @@ if (!String.prototype.quote) {
     };
 }dw.corpus = function(){
 	var corpus = {};
-	
+
 	corpus.frequency = function(transform, o){
 		o = o || {};
 		var inputs = o.inputs || [], input = inputs[inputs.length-1];
-		
+
 		if(input){
 			switch(input.type){
 				case dw.engine.highlight:
@@ -5263,9 +5263,9 @@ if (!String.prototype.quote) {
 								case dw.transform.FILTER:
 
 										return 8;
-							}		
+							}
 						}
-					}	
+					}
 					break;
 				case dw.engine.row:
 					var t = dw.row(dw.empty());
@@ -5277,22 +5277,22 @@ if (!String.prototype.quote) {
 							}
 						}
 					}
-					
-					
+
+
 					if(transform.name===dw.transform.SET_NAME){
 						var rows = input.params.rows;
 						if(rows.length === 1 && rows[0] < 4){
 							if(!dw.row(dw.empty().percent_valid(80)).test(input.params.table, rows[0])){
-								return 40	
+								return 40
 							}
 						}
-						
+
 					}
-					
+
 			}
 		}
-		
-		
+
+
 
 
 
@@ -5300,21 +5300,21 @@ if (!String.prototype.quote) {
 			case dw.transform.SPLIT:
 
 				return 35;
-			
+
 			case dw.transform.EXTRACT:
 
 				return 32;
-			
+
 			case dw.transform.CUT:
 
 				return 28;
-			
+
 			case dw.transform.DROP:
 
 				return 13;
-				
+
 			case dw.transform.FOLD:
-	
+
 				return 12;
 
 			case dw.transform.UNFOLD:
@@ -5325,22 +5325,22 @@ if (!String.prototype.quote) {
 				return 8;
 
 
-				case dw.transform.SET_NAME:					
+				case dw.transform.SET_NAME:
 
 					return 4;
 
-						case dw.transform.SHIFT:					
+						case dw.transform.SHIFT:
 
 							return 5;
-			
-			case dw.transform.FILL:					
-				
+
+			case dw.transform.FILL:
+
 				return 21;
-				
+
 			case dw.transform.MERGE:
-			
+
 				return 3;
-				
+
 				case dw.transform.COPY:
 
 					return 6;
@@ -5351,13 +5351,13 @@ if (!String.prototype.quote) {
 
 				return 25;
 		}
-		
+
 	}
-	
+
 	corpus.top_transforms = function(o, k){
 		o = o || {};
 		var transform = o.transform, given_params = o.given_params, needed_params = o.needed_params, table = o.table;
-		
+
 		switch(transform.name){
 			case dw.transform.FILL:
 				if(given_params.indexOf('column')===-1&&needed_params.indexOf('direction')!=-1){
@@ -5385,36 +5385,36 @@ if (!String.prototype.quote) {
 
 			case dw.transform.UNFOLD:
 				if(given_params.indexOf('measure')===-1){
-					
+
 					return get_columns(table, [dw.integer, dw.number, dw.string]).map(function(c){return transform.clone().measure(c)})
-					
-					
-				}					
+
+
+				}
 				return [transform.clone()]
 
 			default:
 				return [transform.clone()]
 		}
 	}
-	
+
 	get_columns = function(table, type_hierarchy, count){
 		var cols = table.slice(0);
 		cols.map(function(c){})
 		cols.sort(function(a, b){
 			var aindex = type_hierarchy.indexOf(a.wrangler_type.name)
 			var bindex = type_hierarchy.indexOf(b.wrangler_type.name)
-			
+
 			if(aindex===-1) aindex = 1000000;
 			if(bindex===-1) bindex = 1000000;
-			
+
 			if(aindex < bindex) return -1;
 			if(bindex < aindex) return -1;
-			
+
 			return 0;
 		})
 		return cols.slice(0, count).map(function(c){return c.name})
 	}
-	
+
 	return corpus;
 }
 enable_proactive = true;
@@ -5802,7 +5802,7 @@ dw.engine = function(options){
 
 		transforms = sortTransforms(transforms)
 
-		
+
 		transforms.unshift(workingTransform)
 
 
@@ -5865,7 +5865,7 @@ dw.engine = function(options){
 			}
 		}
 
-		
+
 		var remaining_count = 6 - total_count;
 
 
@@ -6374,7 +6374,7 @@ dw.get_column_stats = function(col, nRows) {
 	var pctStrings = numStrings / nRows;
 
 
-	
+
 
 	colHomogeneity = pctDates*pctDates + pctNumbers*pctNumbers + pctStrings*pctStrings;
 
@@ -6421,7 +6421,7 @@ dw.is_slice_all_valid_and_unique = function(lst, i) {
 }
 
 dw.raw_inference = function(raw_text){
-	
+
 	var subsample = raw_text.substr(0, 10000)
 	var total = subsample.length;
 	var newlines = 0,
@@ -6431,7 +6431,7 @@ dw.raw_inference = function(raw_text){
 		tabs = 0,
 		spaces = 0,
 		pipes = 0;
-	
+
 	for(var x = 0; x < total; ++x){
 		var ch = subsample[x]
 		switch(ch){
@@ -6456,10 +6456,10 @@ dw.raw_inference = function(raw_text){
 			case ' ':
 				spaces++
 			break
-			
+
 		}
 	}
-	
+
 	var inference = {}
 	var delimiterStrength = Math.max(commas, tabs, pipes);
 	var cutoff = .8*newlines
@@ -6476,15 +6476,15 @@ dw.raw_inference = function(raw_text){
 			inference.type = 'pipes'
 			inference.delimiter = '\\|'
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
 		if(quotes >= 2){
 			inference.ignore = 'double quotes'
 			inference.quote_character = '"';
@@ -6493,42 +6493,42 @@ dw.raw_inference = function(raw_text){
 			inference.ignore = 'single quotes'
 			inference.quote_character = "'";
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	var transforms = [dw.split('data').on('\n').max(0).result(dw.ROW)]
-	
+
 	if(inference.type){
 		var split = dw.split('data').max(0).on(inference.delimiter);
 				if(inference.quote_character){
 					split.quote_character(inference.quote_character)
 				}
 				transforms.push(split)
-			
+
 				if(inference.quote_character){
 					transforms.push(dw.cut().on(inference.quote_character).max(0))
 				}
-		
-	}
-	
 
-	
+	}
+
+
+
 	return {inference:inference, transforms:transforms}
-	
-	
+
+
 }
 var dw = dw || {};
 dw.row_inference = function(){
 	var r = {};
-	
+
 	r.candidates = function(table, records, o){
-		
+
 		o = o || {}
 		var type = o.type || dw.engine.row, candidates = [];
 
-		if(records.length){		
+		if(records.length){
 			switch(type){
 				case dw.engine.row:
 
@@ -6536,18 +6536,18 @@ dw.row_inference = function(){
 					candidates.push({row:index})
 					candidates.push({keys:records})
 					if(records.length===1){
-						candidates.push({header_row:records[0]})						
+						candidates.push({header_row:records[0]})
 					}
 					candidates = candidates.concat(enumerateEmpty(table, records))
 					candidates = candidates.concat(enumerateRowEquals(table, records))
 					candidates = candidates.concat(enumerateRowCycle(table, records))
 					candidates = candidates.concat(enumeratePromote(table, records))
 					return candidates;
-			
+
 				case dw.engine.highlight:
 
 					records = records.filter(function(r){return r.text.length > 0});
-					
+
 					candidates = candidates.concat(enumerateEquals(table, records))
 					candidates = candidates.concat(enumerateStartsWith(table, records))
 					candidates = candidates.concat(enumerateContains(table, records))
@@ -6555,25 +6555,25 @@ dw.row_inference = function(){
 					return candidates;
 			}
 		}
-		
-		
+
+
 		return []
-		
+
 	}
-	
-	
+
+
 	var enumeratePromote = function(table, records, o){
 		var candidates = [];
 		if(records.length === 1){
 			var r = records[0];
 			if(r < 5){
-				
+
 			}
 		}
 		return candidates.map(function(c){return {row:c}});
 	}
-	
-	
+
+
 	var enumerateRowEquals = function(table, records, o){
 		var candidates = [];
 		if(records.length){
@@ -6598,15 +6598,15 @@ dw.row_inference = function(){
 
 		return candidates.map(function(c){return {row:c}});
 	}
-	
+
 	var enumerateRowCycle = function(table, records, o){
-		
+
 		if(records.length >= 2){
 			var sortedRecords = records.slice().sort(function(a,b){return a-b > 0});
 			var difference = sortedRecords[1]-sortedRecords[0];
-			
+
 			if(difference===1) return [];
-			
+
 			for(var i = 1; i < sortedRecords.length - 1; ++i){
 				if(sortedRecords[i+1]-sortedRecords[i]!=difference){
 					return []
@@ -6614,37 +6614,37 @@ dw.row_inference = function(){
 			}
 
 			var all = dw.row(dw.rowCycle(difference, sortedRecords[0]%difference))
-			
-			
-			
+
+
+
 			var t = [all].reverse()
-			
+
 			return t.map(function(x){return {row:x}})
-			
+
 		}
-		
+
 		return [];
-		
-		
-		
-		
+
+
+
+
 	}
-	
-	
+
+
 	var enumerateEquals = function(table, records, o){
 		if(records.length > 0){
 			var record = records[records.length-1];
 			if(record.start === 0 && record.end === record.text.length){
 				var t = dw.row(dw.eq(record.col, record.text.substring(record.start, record.end), true));
 				return [{row:t}]
-				
+
 			}
 		}
 		return []
 	}
-	
-	
-	
+
+
+
 	var enumerateStartsWith = function(table, records, o){
 
 		if(records.length > 0){
@@ -6656,26 +6656,26 @@ dw.row_inference = function(){
 			}
 		}
 		return []
-		
+
 	}
-	
+
 	var enumerateContains = function(table, records, o){
 
 		if(records.length > 0){
 			var record = records[records.length-1];
 			var t = dw.row(dw.contains(record.col, record.text.substring(record.start, record.end), true));
 			return [{row:t}]
-			
+
 		}
 		return []
-		
+
 	}
-	
-	
+
+
 	var enumerateIsNull = function(table, records, o){
-		
+
 	}
-	
+
 
 
 	var enumerateEmpty = function(table, records, o){
@@ -6687,55 +6687,55 @@ dw.row_inference = function(){
 		}
 		return [{row:dw.row(dw.empty())}]
 	}
-	
-	
+
+
 	return r;
 }
 dw.edit_inference = function(){
 	var r = {};
-	
+
 	r.candidates = function(table, records, o){
-		
+
 		o = o || {}
 		var type = o.type || dw.engine.edit, candidates = [];
 
-		if(records.length){		
-				
+		if(records.length){
+
 			var record = records[records.length-1];
 			var oldVal = table[record.position.col][record.position.row];
 			var val = record.val;
-			
+
 			candidates.push({column:table[record.position.col].name, to:record.val, row:dw.row(dw.rowIndex([record.position.row]))});
 			var colname = table[record.position.col].name;
-			
+
 			if(oldVal != undefined) oldVal = ''+oldVal;
-			
+
 			if(oldVal){
-				candidates.push({column:colname, to:record.val, row:dw.row(dw.eq(colname, oldVal, true))});				
+				candidates.push({column:colname, to:record.val, row:dw.row(dw.eq(colname, oldVal, true))});
 			}
 			else{
-				candidates.push({column:colname, to:record.val, row:dw.row(dw.is_null(colname))});			
+				candidates.push({column:colname, to:record.val, row:dw.row(dw.is_null(colname))});
 			}
-			
 
-			
+
+
 			if(oldVal && val == oldVal.toUpperCase()){
-				candidates.push({column:colname, update_method:dw.edit.upper});			
+				candidates.push({column:colname, update_method:dw.edit.upper});
 			}
 			if(oldVal && val == oldVal.toLowerCase()){
-				candidates.push({column:colname, update_method:dw.edit.lower});			
+				candidates.push({column:colname, update_method:dw.edit.lower});
 			}
 			if(oldVal && val.substr(1) == oldVal.substr(1)){
 				if(val[0]!=oldVal[0]){
 					if(val[0]===oldVal[0].toUpperCase()){
-						candidates.push({column:colname, update_method:dw.edit.capitalize});					
-					}					
+						candidates.push({column:colname, update_method:dw.edit.capitalize});
+					}
 					else if(val[0]===oldVal[0].toLowerCase()){
 						candidates.push({column:colname, update_method:dw.edit.uncapitalize});
-					}					
+					}
 				}
 			}
-			
+
 			if(oldVal===undefined || oldVal.replace(/[ \t\n]/g, '').length===0){
 				var max_dist = 15;
 				var col = record.position.col;
@@ -6750,7 +6750,7 @@ dw.edit_inference = function(){
 						else{
 							break
 						}
-						
+
 					}
 				}
 				for(var i = row-1; i >= Math.max(row-max_dist, 0); --i){
@@ -6763,7 +6763,7 @@ dw.edit_inference = function(){
 						else{
 							break
 						}
-						
+
 					}
 				}
 
@@ -6794,22 +6794,22 @@ dw.edit_inference = function(){
 					}
 				}
 			}
-			
+
 
 
 
 			return candidates;
-			
+
 
 		}
-		
-		
+
+
 		return []
-		
+
 	}
-	
-	
-	
+
+
+
 	return r;
 }
 dw.infer_type_transforms = function(table){
@@ -6904,17 +6904,17 @@ dw.clause = function(options){
 	options = options || {};
 	var editor_class = options.editor_class;
 
-	
+
 	var clause = {}, element = jQuery(document.createElement('span'));
-	dv.ivar(clause, [{name:'onedit', initial:undefined}])	
-	
+	dv.ivar(clause, [{name:'onedit', initial:undefined}])
+
 	clause.draw = function(container, draw_options) {
 		draw_options = draw_options || {}, editable = draw_options.editable || false;
-		
+
  		var description = dw.jq('span').append(' ' + clause.description() + ' ')
-		
+
 		element.append(description);
-		
+
 		if(!clause.plain){
 			element.addClass('editableClause').addClass(editor_class)
 
@@ -6924,34 +6924,34 @@ dw.clause = function(options){
 					var editor = clause.editor();
 					element.append(editor)
 				})
-				
-				
+
+
 			}
 		}
-		
+
 		clause.done_editing = function(params){
 			draw_options.onedit(params)
 		}
-		
+
 		container.append(element);
 	}
-	
-	
-		
+
+
+
 	return clause;
-		
+
 }
 
 dw.clause.get = function(transform, param){
-	
+
 	switch(param){
-		
+
 		case 'row':
 			return dw.row_clause(transform, transform[param](), param)
 		case 'keys':
 			return dw.key_clause(transform, transform[param](), param)
 		case 'column':
-			return dw.column_clause(transform, transform[param](), param)		
+			return dw.column_clause(transform, transform[param](), param)
 		case 'max':
 			return dw.select_clause(transform, {select_options:{'0':'repeatedly','1':'once'}, param:'max'})
 		case 'drop':
@@ -6964,14 +6964,14 @@ dw.clause.get = function(transform, param){
 		case 'on':
 		case 'before':
 		case 'after':
-		case 'ignore_between':		
+		case 'ignore_between':
 			return dw.regex_clause(transform, param);
-		case 'quote_character':		
+		case 'quote_character':
 			return dw.select_other(transform, param, {});
 		default:
 			return dw.input_clause(transform, param)
 	}
-	
+
 }
 
 
@@ -7012,34 +7012,34 @@ dw.combo_with_other = function(select_options, options){
 	dw.add_select_option(editor, dw.combo_with_other.other)
 	editor.val(options.val)
 	return editor;
-	
+
 }
 
 dw.combo_with_other.other = 'other...'
 dw.column_clause = function(t, columns, param, options){
-	
+
 	options = options || {};
 	options.editor_class = options.editor_class || 'updatedColumn';
 	var extra_text = options.extra_text || '';
-	
+
 	var clause = dw.clause(options), editor;
-	
+
 	clause.description = function(){
 		var x = columns.slice(0,Math.min(4, columns.length)).map(dw.display_name).join(', ')
 
 		if(columns.length > 4){
 			x += '...';
 		}
-		
+
 		return x + extra_text;
 	}
-	
+
 	clause.editor = function(draw_options){
 		draw_options = draw_options || {};
 		if(draw_options.table){
 			editor = dw.jq('select')
 			if(!options.single){
-				
+
 			}
 			else{
 				editor.change(function(){
@@ -7053,21 +7053,21 @@ dw.column_clause = function(t, columns, param, options){
 				dw.add_select_option(editor, dw.display_name(c.name), c.name);
 			})
 			var v = (columns.length) ? columns : ['all columns'];
-			
+
 			var onEdit = function(){
 				var v = editor.val() || [];
 				if(v.indexOf('all columns')!=-1) v = []
 				t = t[param](v)
 				clause.done_editing({type:dw.engine.param, value:v, param:options.param, transform:t});
 			}
-			
+
 			editor.val(v);
 
 			editor.blur(function(){
 				onEdit();
 			})
-			
-			
+
+
 
 		}
 		else{
@@ -7079,11 +7079,11 @@ dw.column_clause = function(t, columns, param, options){
 				clause.done_editing({type:dw.engine.param, value:editor.val(), param:param, transform:t});
 			})
 		}
-		
+
 		return editor;
-		
+
 	}
-	
+
 	clause.value = function(){
 		var vals = editor.val().replace(/ /g, '').split(/,/g);
 		if(options.clean_val){
@@ -7091,55 +7091,55 @@ dw.column_clause = function(t, columns, param, options){
 		}
 		return vals;
 	}
-	
+
 	return clause;
-	
+
 }
 dw.input_clause = function(t, param){
-	
-	var clause = dw.clause(), editor, input = t[param]();
-	
 
-	
+	var clause = dw.clause(), editor, input = t[param]();
+
+
+
 	clause.description = function(){
 		return input;
 	}
-	
+
 	clause.editor = function(){
 		editor = jQuery(document.createElement('input'));
 		editor.val(clause.description())
-		
+
 		editor.blur(function(){
 
 			t = t[param](clause.value())
 			clause.done_editing({type:dw.engine.param, value:editor.val(), param:param, transform:t});
 		})
-		
-		
+
+
 		return editor;
 	}
-	
+
 	clause.value = function(){
 		return editor.val();
 	}
-	
+
 	return clause;
-	
+
 }
 dw.key_clause = function(t, keys, param, options){
 
 
-	
+
 	options = options || {};
 	options.editor_class = options.editor_class || 'updatedColumn';
 	var extra_text = options.extra_text || '';
-	
+
 	var clause = dw.clause(options), editor;
-	
+
 	clause.description = function(){
 		return keys.map(function(k){return k==='header' ? k : Number(k)+1}).join(', ')+extra_text;
 	}
-	
+
 	clause.editor = function(draw_options){
 		draw_options = draw_options || {};
 		editor = jQuery(document.createElement('input'));
@@ -7149,11 +7149,11 @@ dw.key_clause = function(t, keys, param, options){
 			t = t[param](clause.value())
 			clause.done_editing({type:dw.engine.param, value:clause.value(), param:param, transform:t});
 		})
-				
+
 		return editor;
-		
+
 	}
-	
+
 	clause.value = function(){
 		var vals = editor.val().replace(/ /g, '').replace('header', '-1').split(/,/g).map(function(c){return c==='header' ? c : Number(c)-1});
 		if(options.clean_val){
@@ -7161,99 +7161,99 @@ dw.key_clause = function(t, keys, param, options){
 		}
 		return vals;
 	}
-	
+
 	return clause;
-	
+
 }
 dw.regex_clause = function(t, param, options){
-	
 
-	
+
+
 	options = options || {};
 	options.editor_class = options.editor_class || 'updatedColumn';
-	
+
 
 
 	var clause = dw.clause(options), editor, regex = options.value || t[param]();
-	
+
 	clause.description = function(){
 		return dw.regex.friendly_description(regex).replace(/^\/|\/$/g,'');
 	}
-	
+
 	clause.editor = function(){
 		editor = jQuery(document.createElement('input'));
-		
+
 		var val = regex ? regex.toString().replace(/^\/|\/$/g,'').replace(/\n/g, '\\n').replace(/\t/g, '\\t') : '';
 
 		editor.val(val)
-		
+
 		editor.blur(function(){
-			
+
 			var newval = clause.val();
-			
-			
+
+
 			t = t[param](clause.val())
 			clause.done_editing({type:dw.engine.param, value:clause.val(), param:param, transform:t});
 
 
 		})
-		
+
 		return editor;
 	}
-	
+
 	clause.editor = function(){
 		var val = regex ? regex.toString().replace(/^\/|\/$/g,'').replace(/\n/g, '\\n').replace(/\t/g, '\\t') : '';
 		var regex_options = [{name:'comma', value:','},{name:'tab', value:'\\t'},{name:'whitespace', value:' '},{name:'newline', value:'\\n'},{name:'pipe', value:'\\|'},{name:'period', value:'\\.'}]
 		editor = dw.combo_with_other(regex_options, {val:val, ondone:function(val){
-			var newval = clause.val(val);	
+			var newval = clause.val(val);
 			t = t[param](newval)
 			clause.done_editing({type:dw.engine.param, value:newval, param:param, transform:t});
-			
+
 		}});
 		return editor;
 	}
-	
+
 	clause.val = function(val){
-		
+
 		var val = val || editor.val();
-		
+
 		if(val.length===0) return undefined;
-		
+
 		return new RegExp(val.replace(/\\n/g, '\n').replace(/\\t/g, '\t'))
 	}
-	
+
 	return clause;
-	
+
 }
 dw.row_clause = function(t, row, param, options){
-	
-	
-	
+
+
+
 	options = options || {};
 	options.editor_class = options.editor_class || 'droppedRow';
 	param = param || 'row'
 
 	var clause = dw.clause(options), editor;
-	
+
 	clause.description = function(){
 		if(row != undefined){
 			var d = row.description();
 			if(typeOf(d)==='array') d = d[0];
-			
+
 			if(d.length > 50){
 				d = d.substr(0, 50);
 				d+='...'
 			}
-			
+
 			return d;
 		}
 		else return ''
 	}
-	
+
 	clause.editor = function(){
 		editor = jQuery(document.createElement('input'));
 		editor.val(row ? row.formula() : '')
-		
+
 		editor.blur(function(){
 			t = t[param](clause.val())
 			clause.done_editing({type:dw.engine.param, value:editor.val(), param:param, transform:t});
@@ -7266,178 +7266,178 @@ dw.row_clause = function(t, row, param, options){
 		})
 		return editor;
 	}
-	
+
 	clause.val = function(){
 		var val = editor.val();
 		if(val)	return (dw.row.fromFormula(val))
 		else return undefined
 	}
-	
+
 	return clause;
-	
+
 }
 dw.select_clause = function(t, options){
-	
+
 	var clause = dw.clause(), editor, options = options || {};
 	var param = options.param;
 
 	var value = options.value || t[param]();
-	
-	
-	
-	
+
+
+
+
 	clause.description = function(container){
-		
+
 		editor = jQuery(document.createElement('select'))
-				
+
 		return options.select_options[value];
 	}
-	
-	
+
+
 	clause.editor = function(){
 		editor = dw.jq('select')
-		
+
 		dv.keys(options.select_options).forEach(function(o){
 
-			
+
 			var option = document.createElement("option");
 			option.value = o;
 			option.text = options.select_options[o];
 			editor[0].options.add(option)
-			
-			
-			
-			
+
+
+
+
 		})
-		
+
 		editor.val(value)
-		
-		
+
+
 		editor.change(function(){
 				t = t[param](editor.attr('value'))
 				clause.done_editing({type:dw.engine.param, value:editor.attr('value'), param:options.param, transform:t});
 			})
-				
+
 			editor.blur(function(){
 				t = t[param](editor.attr('value'))
 				clause.done_editing({type:dw.engine.param, value:editor.attr('value'), param:options.param, transform:t});
 			})
 
-		
+
 
 
 
 		return editor;
 	}
-	
-	
+
+
 	clause.on_edit = function(){
-		
-		
+
+
 	}
-	
-	
+
+
 	clause.value = function(){
 		return editor.attr('value');
 	}
-	
-	
+
+
 	return clause;
-	
+
 }
 dw.select_other = function(t, param, options){
-	
 
-	
+
+
 	options = options || {};
 	options.editor_class = options.editor_class || 'updatedColumn';
-	
+
 
 
 	var clause = dw.clause(options), editor, val = options.value || t[param]() || '';
-	
+
 	clause.description = function(){
 		return val;
 	}
-	
+
 	clause.editor = function(){
 		editor = jQuery(document.createElement('input'));
-		
+
 		editor.val(val)
-		
+
 		editor.blur(function(){
-			
+
 			var newval = clause.val();
-				
+
 			t = t[param](clause.val())
 			clause.done_editing({type:dw.engine.param, value:clause.val(), param:param, transform:t});
 
 
 		})
-		
+
 		return editor;
 	}
-	
+
 	clause.editor = function(){
-		
+
 		var val_options = [{name:'Quotes', value:'"'},{name:'Single Quotes', value:"'"}]
 		editor = dw.combo_with_other(val_options, {val:val, ondone:function(val){
-			var newval = clause.val(val);	
+			var newval = clause.val(val);
 			t = t[param](newval)
 			clause.done_editing({type:dw.engine.param, value:newval, param:param, transform:t});
-			
+
 		}});
 		return editor;
 	}
-	
+
 	clause.val = function(val){
-		
+
 		var val = val || editor.val();
-		
+
 		if(val.length===0) return undefined;
-		
+
 		return val;
 	}
-	
+
 	return clause;
-	
+
 }
 dw.text_clause = function(text){
 	var clause = dw.clause();
-	
+
 	clause.plain = true;
-	
+
 	clause.description = function(){
 		return text;
 	}
-	
+
 	return clause;
 }
 dw.descriptionEditor = function(container, transform, options){
 	var editor = {};
-	
-	
-	
+
+
+
 	editor.draw = function(){
-		
+
 
 
 		var clauses = transform.description();
-		
+
 		clauses.forEach(function(clause){
 			if(typeOf(clause)==='string')
 				clause = dw.text_clause(clause)
 
 			clause.draw(container, options);
 		})
-		
-		
+
+
 	}
-	
+
 	return editor;
 }
 dw.detail_editor = function(container, transform, options){
-	
+
 	var editor = {};
 
 	ignore = ['status', 'table', 'which', 'drop', 'insert_position', 'ignore_between', 'update', 'method']
@@ -7455,59 +7455,59 @@ dw.detail_editor = function(container, transform, options){
 				detail = dw.jq('div').addClass('detail')
 				var label = dw.jq('div').append(param).addClass('label');
 				detail.append(label)
-			
+
 				clause = dw.clause.get(transform, param)
 				clause.done_editing = function(params){
 					options.onedit(params);
 				};
 				detail.append(clause.editor(options).addClass('detail_editor_input'))
-			
+
 				container.append(detail)
 				detail.append(dw.jq('div').addClass('clear'))
 			})
-		
+
 		return container;
-		
+
 	}
-	
-	
+
+
 	return editor;
 }
 dw.editor = function(container, suggestions, options){
 
 	var editor = {}, onpromote = options.onpromote, onhighlight = options.onhighlight, onselect = options.onselect, onedit = options.onedit, onclear = options.onclear, header, title;
-	
+
 	editor.draw = function(){
 		var descriptionWrapper, addButton,  editorWraper;
 		editorWrapper = jQuery(document.createElement('div')).attr('id', 'editorTransformContainer')
 
-	
+
 			header = dw.jq('div').addClass('menu').attr('id', 'suggestionsBanner')
 			title = dw.jq('span').append('Suggestions').attr('id', 'suggestionsTitle')
 
 			header.append(title)
 		container.append(header)
-	
+
 
 		container.append(editorWrapper)
-	
-		
-		
-			
 
-	
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
+
 
 		suggestions.forEach(function(s, i){
-			
-			
-			
-			
-			var sWrapper = jQuery(document.createElement('div')).addClass('suggestion')			
+
+
+
+
+			var sWrapper = jQuery(document.createElement('div')).addClass('suggestion')
 			if(!i) sWrapper.addClass('firstSuggestion')
 			else sWrapper.css('opacity', 0);
 
@@ -7515,47 +7515,47 @@ dw.editor = function(container, suggestions, options){
 			editorWrapper.append(sWrapper)
 
 			if(s){
-				descriptionWrapper = jQuery(document.createElement('div')).addClass('descriptionEditor')			
+				descriptionWrapper = jQuery(document.createElement('div')).addClass('descriptionEditor')
 				addButton = jQuery(document.createElement('div')).addClass('editorButton addButton')
 
 				addButton.click(function(){
 					onselect(editor.transform())
 				})
-				
-				
+
+
 				sWrapper.click(function(){
-					
+
 					if(i!=0) onselect(editor.transform())
-					
+
 				})
-				
-				
+
+
 				dw.descriptionEditor(descriptionWrapper, s, {onedit:onedit, editable:(i===0), table:options.table}).draw()
 
 
 				if(i===0&&s!=null){
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				}
 
 
@@ -7563,7 +7563,7 @@ dw.editor = function(container, suggestions, options){
 				sWrapper.append(addButton)
 
 				sWrapper.append(jQuery(document.createElement('div')).addClass('clear'));
-				
+
 				var hoverConfig = {
 				     over: function(e){
 						var old = editor.selected();
@@ -7578,33 +7578,33 @@ dw.editor = function(container, suggestions, options){
 
 				sWrapper.hoverIntent(hoverConfig)
 
-				
-				
-				
 
-				
-				
-				
-				
-				
-				
-				
+
+
+
+
+
+
+
+
+
+
 			}
 			else{
 				sWrapper.addClass('emptySuggestion')
 			}
-			
+
 		})
-		jQuery('.suggestion').filter(':not(.suggestion.selected)').fadeTo(500, 1);			
+		jQuery('.suggestion').filter(':not(.suggestion.selected)').fadeTo(500, 1);
 		return editor;
 	}
-	
+
 	editor.promote = function(){
 		var fadeTime = 800, selected = editor.selected(), offset = selected.offset(),
 			primary = jQuery('.suggestion:first'), primaryOffset = primary.offset(), top = primaryOffset.top-primary.height()-85, width = selected.width();
-			
-			
-		jQuery('.suggestion').filter(':not(.suggestion.selected)').fadeTo(fadeTime, 0);			
+
+
+		jQuery('.suggestion').filter(':not(.suggestion.selected)').fadeTo(fadeTime, 0);
 		setTimeout(function(){
 			selected.css('position', 'absolute').css('top', offset.top-selected.height()-100).width(width).animate({
 							top:top,
@@ -7617,32 +7617,32 @@ dw.editor = function(container, suggestions, options){
 		}, fadeTime)
 
 
-		
+
 
 	}
-	
-	
+
+
 	editor.prev = function(){
 		var old = editor.selected();
 		if(old.length){
-			deselect(old);	
+			deselect(old);
 			select(old.prev())
-		}		
+		}
 		else{
 			select(jQuery('.suggestion:last'))
 		}
 	}
-	
+
 	editor.next = function(){
 		var old = editor.selected();
 		if(old.length){
-			deselect(old);	
+			deselect(old);
 			select(old.next())
-		}		
+		}
 		else{
 			select(jQuery('.suggestion:first'))
 		}
-		
+
 	}
 
 	editor.first_suggestion = function(){
@@ -7660,46 +7660,46 @@ dw.editor = function(container, suggestions, options){
 			select(jQuery('.suggestion:nth-child(2)'))
 		}
 	}
-	
+
 	editor.transform = function(){
-		
+
 		return suggestions[editor.selected().index()];
 	}
-	
+
 	function select(e){
 		e.addClass('selected')
 		onhighlight({transform:editor.transform()})
 	}
-	
+
 	function deselect(e){
 		e.removeClass('selected')
 	}
-	
+
 	editor.selected = function(){
 		return jQuery('.suggestion.selected')
 	}
 
 
 	return editor;
-	
+
 }
 dw.script = function(container, wrangler, options){
 	var script = {};
-	
+
 	script.draw = function(){
 
 		var descriptionWrapper, toggleButton, otherButton,  editorWraper, toggleClass, importScript, exportScript, title, header, initial = options.initial || [], onedit = options.onedit;
-		
+
 		header = dw.jq('div').addClass('menu').attr('id', 'scriptBanner')
 		title = dw.jq('span').append('Script').attr('id', 'scriptTitle')
 		importScript = dw.jq('span').append('Import').attr('id', 'scriptImport').addClass('scriptIO')
 		exportScript = dw.jq('span').append('Export').attr('id', 'scriptExport').addClass('scriptIO')
-		
+
 		exportScript.click(options.onexport)
-		
+
 		container.append(header)
 		header.append(title).append(exportScript);
-		
+
 		editorWrapper = jQuery(document.createElement('div')).attr('id','scriptTransformContainer')
 		container.append(editorWrapper)
 
@@ -7711,14 +7711,14 @@ dw.script = function(container, wrangler, options){
 
 				var tWrapper = jQuery(document.createElement('div')).addClass('scriptTransform')
 
-				
+
 				tWrapper.addClass(t.status())
-				
+
 				descriptionWrapper = jQuery(document.createElement('div')).addClass('descriptionEditor')
 				editorWrapper.append(tWrapper)
-				
+
 				otherButton = jQuery(document.createElement('div'));
-				
+
 				if(t.active()){
 					otherButton.addClass('editorButton annotateButton')
 				}
@@ -7727,25 +7727,25 @@ dw.script = function(container, wrangler, options){
 					otherButton.click(function(){
 						t.delete_transform();
 						options.edit({transform:t, type:'delete'});
-					})					
+					})
 				}
 
-				
-				
-				
+
+
+
 				toggleButton = jQuery(document.createElement('div')).addClass('editorButton').addClass('primaryButton')
-				
-				
+
+
 				if(t.invalid()){
 					toggleButton.attr('title', t.errorMessage())
 				}
 				else{
 					toggleButton.click(function(){
-						
+
 						t.toggle();
 						options.edit({transform:t, type:(t.active()?'redo':'undo')});
 					})
-					
+
 					if(t.inactive()){
 						toggleButton.attr('title', 'Redo Transform')
 					}
@@ -7753,9 +7753,9 @@ dw.script = function(container, wrangler, options){
 						toggleButton.attr('title', 'Undo Transform')
 					}
 				}
-				
-				
-				
+
+
+
 
 				dw.descriptionEditor(descriptionWrapper, t, {onedit:onedit, editable:true}).draw()
 
@@ -7765,9 +7765,9 @@ dw.script = function(container, wrangler, options){
 				tWrapper.append(descriptionWrapper)
 				tWrapper.append(toggleButton)
 				tWrapper.append(otherButton)
-				tWrapper.append(jQuery(document.createElement('div')).addClass('clear'))				
-				
-				
+				tWrapper.append(jQuery(document.createElement('div')).addClass('clear'))
+
+
 				detail_toggler.click(function(event){
 					if(t.show_details){
 						hide_details();
@@ -7779,7 +7779,7 @@ dw.script = function(container, wrangler, options){
 					}
 				})
 				var hide_details = function(){
-					
+
 					tWrapper.find('.detail_editor').remove();
 					detail_toggler.removeClass('detail_expanded')
 				}
@@ -7794,35 +7794,35 @@ dw.script = function(container, wrangler, options){
 				}
 
 			}
-			
 
 
-			
+
+
 		})
-		
+
 		jQuery('.scriptTransform').mouseenter(function(){
 			jQuery(this).addClass('selected')
 		}).mouseleave(function(){
 			jQuery(this).removeClass('selected')
 		})
-		
+
 		return script;
 	}
-		
+
 	return script;
 }
 dw.tmenu = function(container, options){
-	
+
 	var menu = {};
-	
+
 	var options = options || {}, interaction = options.interaction, transforms = options.transforms || [
 		{name:'Text', sub:[{name:'Split', transform:dw.transform.SPLIT},{name:'Cut', transform:dw.transform.CUT},{name:'Extract', transform:dw.transform.EXTRACT},{name:'Edit', transform:dw.transform.CONVERT}]},
 		{name:'Columns', sub:[{name:'Fill', transform:dw.transform.FILL},{name:'Translate', transform:dw.transform.TRANSLATE},{name:'Drop', transform:dw.transform.DROP},{name:'Merge', transform:dw.transform.MERGE}]},
 		{name:'Rows', sub:[{name:'Delete', transform:dw.transform.FILTER},{name:'Fill', transform:dw.transform.FILL},{name:'Promote', transform:dw.transform.SET_NAME}]},
 		{name:'Table', sub:[{name:'Fold', transform:dw.transform.FOLD},{name:'Unfold', transform:dw.transform.UNFOLD},{name:'Transpose', transform:dw.transform.TRANSPOSE}]},
-		{name:'Clear', sub:[]}		
+		{name:'Clear', sub:[]}
 	];
-	
+
 	var ul = dw.jq('div').addClass('tmenu');
 	container.attr('id', 'transformMenu');
 	container.append(ul)
@@ -7840,7 +7840,7 @@ dw.tmenu = function(container, options){
 			sub.hide();
 			m.sub.forEach(function(s){
 				title = dw.jq('p').addClass('submenu').append(dw.jq('a').append(s.name))
-				
+
 				sub.append(title)
 				jQuery(title).click(function(e){
 					interaction({type:dw.engine.filter, transform:s.transform})
@@ -7851,22 +7851,22 @@ dw.tmenu = function(container, options){
 			if(m.name!='Clear'){
 				jQuery(list).click(function(){
 					var position = jQuery(this).position();
-					
-					
+
+
 					sub.css('left', position.left).css('top', position.top+20);
 					sub.show();
-					
+
 					jQuery(this).height(subheight)
 					jQuery(this).addClass('openMenu')
-					
 
-					
-					
+
+
+
 				}).mouseleave(function(){
 					sub.hide();
 					jQuery(this).height(19)
 					jQuery(this).removeClass('openMenu')
-					
+
 				});
 			}
 			else{
@@ -7874,43 +7874,43 @@ dw.tmenu = function(container, options){
 					options.onclear()
 				})
 			}
-			
-			
+
+
 		})
-		
-		
-		
-		
-		
+
+
+
+
+
 		container.append(dw.jq('div').height(20))
-		
+
 	}
-	
-	
-	
-	
+
+
+
+
 	return menu;
-	
+
 }
 dw.transform_menu = function(container, options){
-	
+
 	var menu = {};
-	
+
 	var options = options || {}, interaction = options.interaction, transforms = options.transforms || [
 		{name:'Text', sub:[{name:'Split', transform:dw.transform.SPLIT},{name:'Cut', transform:dw.transform.CUT},{name:'Extract', transform:dw.transform.EXTRACT},{name:'Edit', transform:dw.transform.CONVERT}]},
 		{name:'Columns', sub:[{name:'Fill', transform:dw.transform.FILL},{name:'Translate', transform:dw.transform.TRANSLATE},{name:'Drop', transform:dw.transform.DROP},{name:'Merge', transform:dw.transform.MERGE}]},
 		{name:'Rows', sub:[{name:'Wrap', transform:dw.transform.WRAP}, {name:'Delete', transform:dw.transform.FILTER},{name:'Promote', transform:dw.transform.SET_NAME}]},
 		{name:'Table', sub:[{name:'Fold', transform:dw.transform.FOLD},{name:'Unfold', transform:dw.transform.UNFOLD},{name:'Transpose', transform:dw.transform.TRANSPOSE}]},
-		{name:'Clear', sub:[]}		
+		{name:'Clear', sub:[]}
 	];
-	
-	var vis = d3.select('#'+container.attr('id')), editor = dw.jq('div').addClass('detail_editor_container')
-	
 
-		
+	var vis = d3.select('#'+container.attr('id')), editor = dw.jq('div').addClass('detail_editor_container')
+
+
+
 	menu.draw = function(){
-		
-		
+
+
 		var idx = d3.range(transforms.length)
 
 		var sub = vis.append('div').attr('id', 'menu').selectAll('div.menu_group')
@@ -7926,46 +7926,46 @@ dw.transform_menu = function(container, options){
 		    .on('mousedown', function(d, i){
 				interaction({type:dw.engine.filter, transform:transforms[d].sub[i].transform})
 		      })
-	
-	  jQuery(vis[0]).append(editor)
-		
-	}
-	
 
-	
+	  jQuery(vis[0]).append(editor)
+
+	}
+
+
+
 	menu.update = function(e){
 		editor.empty();
 		jQuery('.selected_menu_option').removeClass('selected_menu_option')
 		if(e.transform){
 			var name = e.transform.name;
 			if(name==='filter') name = 'delete';
-			dw.transform_editor(editor, e.transform, {onedit:options.onedit, table:options.table}).draw()	
+			dw.transform_editor(editor, e.transform, {onedit:options.onedit, table:options.table}).draw()
 			jQuery('.menu_option.'+ name).addClass('selected_menu_option')
 		}
 
 	}
-	
-	
+
+
 	menu.draw();
-	
+
 	menu.update({transform:dw.split()})
 
 
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 
 
 	return menu;
-	
+
 }
 dw.transform_editor = function(container, transform, options){
-	
+
 	var editor = {};
 
 	ignore = ['status', 'table', 'which', 'drop', 'insert_position', 'ignore_between', 'update', 'method']
@@ -7983,22 +7983,22 @@ dw.transform_editor = function(container, transform, options){
 				detail = dw.jq('div').addClass('editor_wrapper')
 				var label = dw.jq('div').append(param.replace(/_/g, ' ')).addClass('label');
 				detail.append(label)
-			
+
 				clause = dw.clause.get(transform, param)
 				clause.done_editing = function(params){
 					options.onedit(params);
 				};
 				detail.append(clause.editor(options).addClass('editor_input'))
-			
+
 				container.append(detail)
 				detail.append(dw.jq('div').addClass('clear'))
 			})
-		
+
 		return container;
-		
+
 	}
-	
-	
+
+
 	return editor;
 }
 dw.wrangler = function(options){
