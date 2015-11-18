@@ -124,7 +124,7 @@
 
 
 
-input, input[type="password"], input[type="search"], isindex {
+#dt_example input, input[type="password"], input[type="search"], isindex {
 -webkit-appearance: textfield;
 -webkit-rtl-ordering: logical;
 -webkit-user-select: text;
@@ -134,7 +134,7 @@ cursor: auto;
 padding: 0px;
 }
 
-input[type='radio']{
+#dt_example input[type='radio']{
 	-webkit-appearance: radio;	
 }
 
