@@ -475,6 +475,7 @@ div.selected_menu_option, div.menu_option:hover {
 	border:1px solid #BDC7D8;
 	padding: 3px 3px 3px 3px;
 	font-size:14px;
+	color: #333;
 }
 
 #wranglerDashboard .label{
