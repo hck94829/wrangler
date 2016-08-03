@@ -30,7 +30,21 @@ dw.listener = function(f) {
 };
 
 
-
+function typeOf(value) {
+  var s = typeof value;
+  if (s === 'object') {
+    if (value) {
+      if (typeof value.length === 'number' &&
+        !(value.propertyIsEnumerable('length')) &&
+        typeof value.splice === 'function') {
+        s = 'array';
+      }
+    } else {
+      s = 'null';
+    }
+  }
+  return s;
+}
 
 
 
@@ -4435,7 +4449,7 @@ dw.vtable = function(container, options){
 
 		var containerID = container.attr('id') + '_table';
 
-		if(otable) otable.fnDestroy();
+		if(otable) otable.destroy();
 
 
 
@@ -4446,7 +4460,7 @@ dw.vtable = function(container, options){
 		console.log(data, columns)
 
 		container.html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="'  + containerID + '"></table>' );
-		otable = $('#'+containerID).dataTable( {
+		otable = $('#'+containerID).DataTable( {
 					"aaData": data,
 					"aoColumns": columns,
 					"aaSorting": [],
@@ -4888,7 +4902,8 @@ dw.vtable = function(container, options){
 	}
 
 	var getPosition = function(e){
-		var aPos = otable.fnGetPosition(e)
+		//var aPos = otable.fnGetPosition(e)
+    var aPos = otable.row(e.parentNode).data()
 		if(typeOf(aPos==='array')) return {row:aPos[0], col:aPos[1]-1};
 		return {row:aPos};
 	}
