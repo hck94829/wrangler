@@ -18,7 +18,7 @@ dw.listen = function(target, type, listener) {
       : target.attachEvent("on" + type, listener);
 };
 
-dw.listener = function(
+dw.listener = function(f) {
   return f.$listener || (f.$listener = function(e) {
       try {
         dw.event = e;
