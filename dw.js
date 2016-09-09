@@ -4904,7 +4904,7 @@ dw.vtable = function(container, options){
 	var getPosition = function(e){
 		//var aPos = otable.fnGetPosition(e)
     var aPos = otable.row(e.parentNode).data()
-		if(typeOf(aPos)==='array')) return {row:aPos[0]-1, col:aPos[1]-1};
+		if(typeOf(aPos)==='array') return {row:aPos[0]-1, col:aPos[1]-1};
 		return {row:aPos};
 	}
 
