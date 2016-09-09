@@ -18,7 +18,7 @@ dw.listen = function(target, type, listener) {
       : target.attachEvent("on" + type, listener);
 };
 
-dw.listener = function(f) {
+dw.listener = function(
   return f.$listener || (f.$listener = function(e) {
       try {
         dw.event = e;
@@ -4904,7 +4904,7 @@ dw.vtable = function(container, options){
 	var getPosition = function(e){
 		//var aPos = otable.fnGetPosition(e)
     var aPos = otable.row(e.parentNode).data()
-		if(typeOf(aPos==='array')) return {row:aPos[0], col:aPos[1]-1};
+		if(typeOf(aPos)==='array')) return {row:aPos[0]-1, col:aPos[1]-1};
 		return {row:aPos};
 	}
 
